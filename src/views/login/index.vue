@@ -10,43 +10,43 @@
           fill="#0066ff" p-id="1471"></path>
         <path d="M528.936186 546.99844" fill="#0066ff" p-id="1472"></path>
       </svg>
-      <h2>账 号 登 录</h2>
+      <h2>{{ isLogin ? '账 号 登 录' : '账 号 注 册' }}</h2>
     </div>
 
-    <!-- <div class="login-box">
+    <div class="login-box" v-show="isLogin">
       <img src="../../assets/images/user.jpg" alt="">
       <h2>Welcome back</h2>
-      <el-form v-model="form">
-        <el-form-item>
-          <el-input v-model="form.name" placeholder="username" :prefix-icon="User" clearable />
+      <el-form :model="form" ref="ruleFormRef" :rules="rules">
+        <el-form-item prop="username">
+          <el-input v-model="form.username" placeholder="请输入用户名" :prefix-icon="User" clearable />
+        </el-form-item>
+        <el-form-item prop="password">
+          <el-input v-model="form.password" type="password" placeholder="请输入密码" :prefix-icon="Key" show-password />
         </el-form-item>
         <el-form-item>
-          <el-input v-model="form.password" type="password" placeholder="password" :prefix-icon="Key" show-password />
-        </el-form-item>
-        <el-form-item>
-          <el-button class="login-btn">登 录</el-button>
+          <el-button class="login-btn" @click="goLogin()">登 录</el-button>
         </el-form-item>
       </el-form>
       <div class="signup">
         <span>没有账号？</span>
-        <a href="javascript:void(0)">注册</a>
+        <a href="javascript:void(0)" @click="isLogin = false">注册</a>
       </div>
-    </div> -->
-    <div class="login-box registered-box">
+    </div>
+    <div class="login-box registered-box" v-show="!isLogin">
       <img src="../../assets/images/user.jpg" alt="">
-      <!-- <h2>Let's get started</h2> -->
       <el-form v-model="form">
         <el-form-item>
-          <el-input v-model="form.name" placeholder="username" :prefix-icon="User" clearable />
+          <el-input v-model="form.username" placeholder="请输入用户名" :prefix-icon="User" clearable />
         </el-form-item>
         <el-form-item>
-          <el-input v-model="form.name" placeholder="email" :prefix-icon="Message" clearable />
+          <el-input v-model="form.email" placeholder="请输入邮箱" :prefix-icon="Message" clearable />
         </el-form-item>
         <el-form-item>
-          <el-input v-model="form.password" type="password" placeholder="password" :prefix-icon="Key" show-password />
+          <el-input v-model="form.password" type="password" placeholder="请输入密码" :prefix-icon="Key" show-password />
         </el-form-item>
         <el-form-item>
-          <el-input v-model="form.password" type="password" placeholder="password" :prefix-icon="Key" show-password />
+          <el-input v-model="form.confirmPassword" type="password" placeholder="请再次确认密码" :prefix-icon="Key"
+            show-password />
         </el-form-item>
         <el-form-item>
           <el-button class="login-btn">注 册</el-button>
@@ -54,7 +54,7 @@
       </el-form>
       <div class="signup">
         <span>已经有账号？</span>
-        <a href="javascript:void(0)">去登录</a>
+        <a href="javascript:void(0)" @click="isLogin = true">去登录</a>
       </div>
     </div>
 
@@ -69,15 +69,59 @@
 
 <script setup>
 import { User, Key, Message } from '@element-plus/icons-vue'
-import { reactive, toRefs } from 'vue'
+import { ref, reactive, toRefs } from 'vue'
+import { useRouter } from 'vue-router'
+import { login } from '@/api/login'
+import { useUserStore } from '@/stores'
+import { ElMessage } from 'element-plus'
+
+
+const router = useRouter()
+const userStore = useUserStore()
+const ruleFormRef = ref(null)
 const data = reactive({
   form: {
-    name: '',
-    password: ''
-  }
+    username: '',
+    password: '',
+    email: '',
+    confirmPassword: ''
+  },
+  rules: {
+    username: [
+      { required: true, message: '请输入用户名', trigger: 'blur' },
+      { min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur' }
+    ],
+    password: [
+      { required: true, message: '请输入密码', trigger: 'blur' },
+      { min: 6, max: 16, message: '长度在 6 到 16 个字符', trigger: 'blur' }
+    ],
+  },
+  isLogin: true
 })
 
-const { form } = toRefs(data)
+const goLogin = () => {
+  ruleFormRef.value.validate(async (valid, fields) => {
+    if (valid) {
+      let params = JSON.parse(JSON.stringify(data.form))
+      delete params.email
+      delete params.confirmPassword
+
+      let res = await login(params)
+      sessionStorage.setItem('userInfo', JSON.stringify(res))
+      sessionStorage.setItem('token', res.token)
+      userStore.setUserInfo(res)
+      userStore.setToken(res.token)
+      router.push('/')
+    } else {
+      console.log('error submit!!', fields);
+      ElMessage.error(fields.message || '请检查文本框内容')
+    }
+  })
+
+
+}
+
+const { form, rules, isLogin } = toRefs(data)
 
 </script>
 
@@ -142,6 +186,7 @@ const { form } = toRefs(data)
 
     h2 {
       font-size: 30px;
+      margin-bottom: 30px;
     }
 
     /deep/.el-input__wrapper {

@@ -1,8 +1,8 @@
 import axios from 'axios';
- 
+
 // 创建axios实例
 const service = axios.create({
-  baseURL: process.env.VUE_APP_BASE_API, // api的base_url
+  baseURL: import.meta.env.VITE_APP_API_URL, // api的base_url
   timeout: 5000 // 请求超时时间
 });
  
@@ -10,7 +10,8 @@ const service = axios.create({
 service.interceptors.request.use(
   config => {
     // 可以在这里添加请求头等信息
-    // 例如：config.headers['Authorization'] = 'Bearer your-token';
+    let token = sessionStorage.getItem('token');
+    config.headers['Authorization'] = 'Bearer ' +token;
     return config;
   },
   error => {
@@ -26,7 +27,7 @@ service.interceptors.response.use(
     // 对响应数据做处理，例如只返回data部分
     const res = response.data;
     // 如果返回的状态码为200，说明成功，可以直接返回数据
-    if (res.code === 200) {
+    if (res.code == 200) {
       return res.data;
     } else {
       // 其他状态码都当作错误处理
