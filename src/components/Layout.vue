@@ -48,6 +48,12 @@ const data = reactive({
     {
       index: '3',
       icon: 'Setting',
+      title: '文章管理',
+      path: '/article'
+    },
+    {
+      index: '4',
+      icon: 'Setting',
       title: '系统管理',
       children: [
         {
