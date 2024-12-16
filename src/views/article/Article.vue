@@ -41,18 +41,15 @@
         layout="total, sizes, prev, pager, next" />
     </div>
   </div>
-  <addDialog ref="addDialogRef" @getData="getData" />
 </template>
 
 <script setup>
 import { reactive, toRefs, ref, onMounted } from 'vue';
-import addDialog from './components/addDialog.vue';
 import { getArticleList, deleteArticle } from '@/api/article.js'
 import dayjs from 'dayjs';
 import { ElMessageBox, ElMessage } from 'element-plus';
 
 
-const addDialogRef = ref(null);
 const data = reactive({
   form: {
     title: '',
@@ -70,11 +67,11 @@ const getData = async () => {
   data.tableData = res.list
 };
 const handleAdd = () => {
-  addDialogRef.value.show();
+  // addDialogRef.value.show();
 };
 const handleEdit = (row) => {
   // console.log('编辑按钮被点击', row);
-  addDialogRef.value.show(row);
+  // addDialogRef.value.show(row);
 };
 const handleDelete = (row) => {
   // console.log('删除按钮被点击', row);
