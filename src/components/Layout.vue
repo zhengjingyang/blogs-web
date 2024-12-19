@@ -16,7 +16,7 @@
       </el-header>
       <el-container>
         <el-aside width="200px">
-          <el-menu default-active="1">
+          <el-menu class="menu-wrap" default-active="1">
             <menu-item v-for="item in menuData" :key="item.index" :item="item" />
           </el-menu>
         </el-aside>
@@ -84,7 +84,7 @@ const { menuData } = toRefs(data)
   color: #fff;
 }
 
-.el-menu {
+:deep(.menu-wrap) {
   background-color: #191a23;
   height: calc(100vh - 50px);
 
@@ -104,7 +104,7 @@ const { menuData } = toRefs(data)
     background-color: #2d8cf0;
   }
 
-  /deep/.el-sub-menu__title {
+  .el-sub-menu__title {
     color: #fff;
 
     &:hover {

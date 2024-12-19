@@ -15,3 +15,7 @@ export function updateArticle(data) {
 export function deleteArticle(id) {
   return service.get(`/article/delete?id=${id}`);
 }
+// 获取文章详情
+export function getArticleDetail(id) {
+  return service.get(`/article/detail?id=${id}`);
+}

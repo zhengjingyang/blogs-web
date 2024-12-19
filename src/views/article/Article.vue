@@ -17,28 +17,23 @@
       <el-button type="primary" @click="handleAdd">新增</el-button>
     </div>
     <div class="table-container">
-      <el-table :data="tableData" border>
+      <el-table :data="tableData" stripe border max-height="630">
         <el-table-column prop="id" label="ID" width="130"></el-table-column>
         <el-table-column prop="title" label="文章名称"></el-table-column>
-        <el-table-column prop="type" label="分类">
-          <!-- <template #default="scope">
-            <span>{{ arrayTurnDict(typeOptions)[scope.row.type] }}</span>
-          </template> -->
-        </el-table-column>
+        <el-table-column prop="type_name" label="分类"></el-table-column>
         <el-table-column prop="created_time" label="创建时间">
           <template #default="scope">
             <span>{{ dayjs(scope.row.created_time).format('YYYY-MM-DD HH:mm:ss') }}</span>
           </template>
         </el-table-column>
-        <el-table-column center label="操作" width="180">
+        <el-table-column align="center" label="操作" width="180">
           <template #default="scope">
             <el-button type="primary" text @click="handleEdit(scope.row)">编辑</el-button>
             <el-button type="primary" text @click="handleDelete(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
-      <el-pagination background :page-sizes="[10, 20, 30, 40]" :pager-count="7" :total="total"
-        layout="total, sizes, prev, pager, next" />
+      <comPagination :pageOptions="pageOptions" @getData="getData" />
     </div>
   </div>
 </template>
@@ -48,30 +43,37 @@ import { reactive, toRefs, ref, onMounted } from 'vue';
 import { getArticleList, deleteArticle } from '@/api/article.js'
 import dayjs from 'dayjs';
 import { ElMessageBox, ElMessage } from 'element-plus';
+import { useRouter } from 'vue-router'
+import comPagination from '@/components/comPagination.vue';
 
-
+const router = useRouter()
 const data = reactive({
   form: {
     title: '',
     type: '',
   },
   tableData: [],
-  pageSize: 10,
-  pageNum: 1,
-  total: 0,
+  pageOptions: {
+    pageSize: 10,
+    pageNum: 1,
+    total: 0
+  },
 });
 const getData = async () => {
-  const res = await getArticleList(data.form)
+  const res = await getArticleList({
+    pageSize: data.pageOptions.pageSize,
+    pageNum: data.pageOptions.pageNum,
+    ...data.form
+  })
   // console.log(res, 'res');
-  data.total = res.totalCount
+  data.pageOptions.total = res.totalCount
   data.tableData = res.list
 };
 const handleAdd = () => {
-  // addDialogRef.value.show();
+  router.push('/add-article')
 };
 const handleEdit = (row) => {
-  // console.log('编辑按钮被点击', row);
-  // addDialogRef.value.show(row);
+  router.push('/add-article?id=' + row.id)
 };
 const handleDelete = (row) => {
   // console.log('删除按钮被点击', row);
@@ -96,7 +98,7 @@ onMounted(() => {
   getData()
 });
 
-const { form, tableData, total } = toRefs(data);
+const { form, tableData, pageOptions } = toRefs(data);
 </script>
 
 <style lang="less" scoped>

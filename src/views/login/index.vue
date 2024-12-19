@@ -189,14 +189,14 @@ const { form, rules, isLogin } = toRefs(data)
       margin-bottom: 30px;
     }
 
-    /deep/.el-input__wrapper {
+    :deep(.el-input__wrapper) {
       width: 266px;
       height: 40px;
       border-radius: 15px;
       color: #000;
     }
 
-    /deep/.el-icon {
+    :deep(.el-icon) {
       font-size: 16px;
       color: #000;
     }
